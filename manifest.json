@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "id": "jesusarchive.eyes",
+  "name": "Eyes",
+  "version": "1.0.0",
+  "author": "jesusarchive",
+  "license": "MIT",
+  "description": "Two eyes in your Omarchy bar, following the pointer across every monitor.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Eyes",
+    "description": "Two eyes that follow the mouse, like xfce4-eyes-plugin did in the Xfce panel. The rim, white, pupil and travel proportions are the constants from x.org's Eyes.c, so it is the same drawing at bar size. Pupils track the cursor on any monitor, park on the pointer when it is over them, and turn with a vertical bar.",
+    "category": "Fun",
+    "aliases": [
+      "eyes",
+      "xeyes",
+      "ojos",
+      "cursor",
+      "mouse",
+      "googly"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "left",
+    "defaults": {
+      "fps": 60,
+      "size": 0,
+      "distance": "Off",
+      "outline": "",
+      "center": "",
+      "pupil": "",
+      "onClick": "",
+      "shape": "stretched"
+    },
+    "schema": [
+      {
+        "key": "fps",
+        "type": "integer",
+        "label": "Samples per second",
+        "min": 1,
+        "max": 144,
+        "step": 1,
+        "defaultValue": 60,
+        "description": "How often the cursor position is read from Hyprland. Lower it to trade smoothness for a little less work."
+      },
+      {
+        "key": "size",
+        "type": "integer",
+        "label": "Eye height (px)",
+        "min": 0,
+        "max": 400,
+        "step": 1,
+        "defaultValue": 0,
+        "description": "Height of the eyes in bar pixels. 0 fits them to the bar height."
+      },
+      {
+        "key": "shape",
+        "type": "enum",
+        "label": "Eye shape",
+        "options": [
+          "stretched",
+          "round"
+        ],
+        "defaultValue": "stretched",
+        "description": "Stretched is the shape xeyes' default 150x100 window gives its eyes, which is what makes them read as eyes rather than as circles."
+      },
+      {
+        "key": "distance",
+        "type": "enum",
+        "label": "Look into the distance",
+        "options": [
+          "Off",
+          "On"
+        ],
+        "defaultValue": "Off",
+        "description": "xeyes' -distance mode: pupil travel scales with how far across the screen the cursor is, instead of staring at full stretch. Off is what xeyes does by default."
+      },
+      {
+        "key": "outline",
+        "type": "string",
+        "label": "Rim color",
+        "defaultValue": "",
+        "description": "Empty is xeyes' own default, black. Use \"theme\" for the bar foreground, or any color such as #ff0000."
+      },
+      {
+        "key": "center",
+        "type": "string",
+        "label": "Eye color",
+        "defaultValue": "",
+        "description": "The white of the eye. Empty is xeyes' own default, white. Use \"theme\" for the bar background, or any color."
+      },
+      {
+        "key": "pupil",
+        "type": "string",
+        "label": "Pupil color",
+        "defaultValue": "",
+        "description": "Empty is xeyes' own default, black. Use \"theme\" for the bar foreground, or any color."
+      },
+      {
+        "key": "onClick",
+        "type": "string",
+        "label": "Left click command",
+        "defaultValue": "",
+        "description": "Shell command to run on left click. Empty means clicking does nothing."
+      }
+    ]
+  }
+}
