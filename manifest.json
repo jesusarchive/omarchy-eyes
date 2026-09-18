@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "jesusarchive",
   "license": "MIT",
-  "description": "Two eyes in your Omarchy bar, following the pointer across every monitor.",
+  "description": "Two eyes in the Omarchy bar that track the pointer across every monitor.",
   "kinds": [
     "bar-widget"
   ],
@@ -14,7 +14,7 @@
   },
   "barWidget": {
     "displayName": "Eyes",
-    "description": "Two eyes that follow the mouse, like xfce4-eyes-plugin did in the Xfce panel. The rim, white, pupil and travel proportions are the constants from x.org's Eyes.c, so it is the same drawing at bar size. Pupils track the cursor on any monitor, park on the pointer when it is over them, and turn with a vertical bar.",
+    "description": "Two xeyes-style eyes that track the pointer across every monitor. The drawing uses the proportions from X.Org's Eyes.c. The pair rotates when the bar is vertical.",
     "category": "Fun",
     "aliases": [
       "eyes",
@@ -45,7 +45,7 @@
         "max": 144,
         "step": 1,
         "defaultValue": 60,
-        "description": "How often the cursor position is read from Hyprland. Lower it to trade smoothness for a little less work."
+        "description": "Number of cursor-position requests sent to Hyprland each second. Lower values use less CPU but produce larger steps."
       },
       {
         "key": "size",
@@ -66,7 +66,7 @@
           "round"
         ],
         "defaultValue": "stretched",
-        "description": "Stretched is the shape xeyes' default 150x100 window gives its eyes, which is what makes them read as eyes rather than as circles."
+        "description": "Stretched uses the proportions of xeyes' default 150x100 window. Round uses circles."
       },
       {
         "key": "distance",
@@ -77,35 +77,35 @@
           "On"
         ],
         "defaultValue": "Off",
-        "description": "xeyes' -distance mode: pupil travel scales with how far across the screen the cursor is, instead of staring at full stretch. Off is what xeyes does by default."
+        "description": "Scale pupil travel by the cursor's distance across the screen. Xeyes disables this option by default."
       },
       {
         "key": "outline",
         "type": "string",
         "label": "Rim color",
         "defaultValue": "",
-        "description": "Empty is xeyes' own default, black. Use \"theme\" for the bar foreground, or any color such as #ff0000."
+        "description": "Leave empty for black. Use \"theme\" for the bar foreground or enter a color such as #ff0000."
       },
       {
         "key": "center",
         "type": "string",
         "label": "Eye color",
         "defaultValue": "",
-        "description": "The white of the eye. Empty is xeyes' own default, white. Use \"theme\" for the bar background, or any color."
+        "description": "Leave empty for white. Use \"theme\" for the bar background or enter a color."
       },
       {
         "key": "pupil",
         "type": "string",
         "label": "Pupil color",
         "defaultValue": "",
-        "description": "Empty is xeyes' own default, black. Use \"theme\" for the bar foreground, or any color."
+        "description": "Leave empty for black. Use \"theme\" for the bar foreground or enter a color."
       },
       {
         "key": "onClick",
         "type": "string",
         "label": "Left click command",
         "defaultValue": "",
-        "description": "Shell command to run on left click. Empty means clicking does nothing."
+        "description": "Run this shell command on left click. Leave empty to disable the action."
       }
     ]
   }

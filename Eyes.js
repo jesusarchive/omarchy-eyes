@@ -1,9 +1,8 @@
 .pragma library
 
-// Geometry and pupil math lifted from the xeyes source (x.org app/xeyes
-// 1.3.0, Eyes.c) so these are the same eyes rather than an impression of
-// them. xeyes lays each eye out in a cell 2.0 units wide; every length below
-// is in those units and the widget scales them to the bar height.
+// Geometry and pupil calculations adapted from x.org app/xeyes 1.3.0,
+// Eyes.c. xeyes gives each eye a 2.0-unit-wide cell. The widget scales these
+// units to the bar height.
 var EYE_OFFSET = 0.1                                     // padding between eyes
 var EYE_THICK = 0.175                                    // thickness of the rim
 var BALL_DIAM = 0.3                                      // the pupil
@@ -18,13 +17,12 @@ var SPACING = 2.0
 var BBOX_W = SPACING + OUTER_DIAM                        // 3.8
 var BBOX_H = OUTER_DIAM                                  // 1.8
 
-// computePupil() from Eyes.c, in eye-local units: dx/dy point from the eye
-// centre to the cursor and the result is the pupil's offset from that centre.
+// Adapt computePupil() from Eyes.c. dx and dy point from the eye centre to the
+// cursor. The result is the pupil's offset from the eye centre.
 //
-// `screen` is the -distance behaviour, off in xeyes by default: instead of
-// staring at full stretch all the time, the pupil's travel scales with how
-// far across the screen the cursor is, so the eyes read as looking *into* the
-// distance. Pass the screen rect relative to the eye centre to switch it on.
+// Pass screen bounds relative to the eye centre to enable xeyes' -distance
+// behaviour. It scales pupil travel by the cursor's distance across the
+// screen. Xeyes disables this option by default.
 function pupilOffset(dx, dy, screen) {
   if (dx === 0 && dy === 0) return { x: 0, y: 0 }
 
@@ -41,14 +39,12 @@ function pupilOffset(dx, dy, screen) {
     var xRatio = dx === 0 || xEdge === 0 ? 0 : dx / xEdge
     var yRatio = dy === 0 || yEdge === 0 ? 0 : dy / yEdge
 
-    // The ray reaches the first screen edge at the larger axis ratio. Using
-    // both axes here also keeps the direction stable in every quadrant.
+    // The larger axis ratio identifies the first screen edge hit by the ray.
     var screenFraction = Math.max(0, Math.min(1, Math.max(xRatio, yRatio)))
     dist *= screenFraction
   }
 
-  // Closer than the pupil can travel, the pupil sits on the cursor itself —
-  // what makes xeyes go cross-eyed when you park the pointer on it.
+  // Place the pupil on a nearby cursor. This produces xeyes' cross-eyed state.
   if (dist > Math.hypot(dx, dy)) return { x: dx, y: dy }
   return { x: dist * Math.cos(angle), y: dist * Math.sin(angle) }
 }

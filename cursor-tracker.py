@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Stream the Hyprland cursor position as "x, y" lines, one per change.
 
-Under X11 any client could ask the server where the pointer was, which is how
-xeyes followed a cursor that was nowhere near its own window. Wayland gives a
-client pointer events only while the pointer is over its own surface, so the
-eyes have to ask the compositor instead: Hyprland answers `cursorpos` on its
-request socket, in the same layout coordinates the monitors are placed in.
+X11 lets xeyes query the pointer outside its window. Wayland sends pointer
+events only while the pointer is over a client's surface. Hyprland provides
+the global position through `cursorpos` on its request socket. The returned
+coordinates use the monitor layout's coordinate system.
 
 Hyprland closes the connection after each reply, so this reconnects for every
 poll. It talks to the socket directly instead of starting `hyprctl` for every
@@ -54,8 +53,7 @@ def main():
         try:
             position = poll(path)
         except OSError:
-            # Hyprland is gone or restarting; the socket path changes with the
-            # instance, so the shell will respawn us with the new one.
+            # The shell starts a new helper when Hyprland exposes a new socket.
             time.sleep(RETRY_DELAY)
             continue
         if position and position != last:

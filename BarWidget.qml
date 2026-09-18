@@ -5,13 +5,11 @@ import Quickshell.Io
 import qs.Ui
 import "Eyes.js" as Eyes
 
-// Eyes in the bar: the two eyes from x.org's demo app, following the pointer
-// across every monitor the way xfce4-eyes-plugin did in its panel.
+// Draw two xeyes-style eyes in the bar and point them at the cursor.
 //
-// The proportions and the pupil math come straight from Eyes.c (see Eyes.js).
-// The one thing that cannot be ported is how xeyes learns where the pointer
-// is: X11 let any client ask the server, Wayland does not, so
-// cursor-tracker.py asks Hyprland for `cursorpos` and streams the answer in.
+// Eyes.js adapts the proportions and pupil calculation from Eyes.c. X11 lets
+// xeyes query the pointer directly. Wayland does not, so cursor-tracker.py
+// reads Hyprland's `cursorpos` response instead.
 BarWidget {
   id: root
   moduleName: "jesusarchive.eyes"
@@ -22,9 +20,8 @@ BarWidget {
     return Math.max(min, Math.min(max, n))
   }
 
-  // Samples per second. xeyes redraws on every pointer motion event; polling
-  // at 60 costs well under a millisecond of CPU per second, and an unchanged
-  // position never reaches the widget at all.
+  // Number of Hyprland cursor-position requests per second. The helper does
+  // not send duplicate positions to the widget.
   readonly property int fps: clamped(setting("fps", 60), 1, 144, 60)
 
   // Height of the eyes in bar pixels. 0 fits them to the bar.
@@ -33,25 +30,21 @@ BarWidget {
     return explicit > 0 ? explicit : Math.max(8, barSize - 8)
   }
 
-  // xeyes maps its 3.8 x 1.8 bounding box onto the window with a separate
-  // scale per axis (SetTransform keeps mx and my independent), so its default
-  // 150x100 window is what gives the eyes their egg shape. Keeping that ratio
-  // is what makes this read as xeyes instead of as two circles; "round" opts
-  // out and gives the shape a square xeyes window would draw.
+  // xeyes maps its 3.8 x 1.8 bounds onto the window with separate horizontal
+  // and vertical scales. Its default 150x100 window turns the circles into
+  // ellipses. The "round" setting uses the aspect ratio of the source bounds.
   readonly property bool round: String(setting("shape", "stretched")) === "round"
   readonly property real drawAspect: round ? Eyes.BBOX_W / Eyes.BBOX_H : 150.0 / 100.0
   readonly property real drawWidth: eyeHeight * drawAspect
 
-  // One bar pixel per xeyes unit, per axis. Every length in the drawing is
-  // measured in unitX and then squashed to unitY by one transform, so the
-  // circles become the same ellipses xeyes fills.
+  // unitX and unitY convert xeyes units to bar pixels. The drawing uses unitX
+  // for its geometry, then a vertical scale converts it to unitY.
   readonly property real unitX: drawWidth / Eyes.BBOX_W
   readonly property real unitY: eyeHeight / Eyes.BBOX_H
   readonly property real centreInset: (1.0 - Eyes.EYE_OFFSET) * unitX
 
-  // xeyes' -distance: pupil travel scales with how far across the screen the
-  // cursor is, so the eyes look *into* the distance rather than staring at
-  // full stretch. Off in xeyes, off here.
+  // xeyes' -distance option scales pupil travel by the cursor's distance from
+  // the eye. Both xeyes and this plugin disable it by default.
   readonly property bool distance: {
     var value = setting("distance", "Off")
     return value === true || String(value) === "On"
@@ -59,8 +52,8 @@ BarWidget {
 
   readonly property string clickCommand: String(setting("onClick", ""))
 
-  // xeyes' own defaults are the X toolkit's foreground and background: a black
-  // rim, a white eye, a black pupil. "theme" takes the bar's colors instead.
+  // xeyes uses black for the rim and pupil, and white for the eye. The value
+  // "theme" replaces those defaults with the bar colours.
   function resolveColor(name, xeyesDefault, themeColor) {
     var value = String(setting(name, ""))
     if (value === "") return xeyesDefault
@@ -72,22 +65,20 @@ BarWidget {
   readonly property color centerColor: resolveColor("center", "white", bar ? bar.background : "white")
   readonly property color pupilColor: resolveColor("pupil", "black", bar ? bar.barForeground : "black")
 
-  // Cursor position in Hyprland's layout coordinates — the same space the
-  // monitors are placed in, so an eye on one screen can look at a pointer on
-  // another.
+  // Hyprland reports the cursor in global layout coordinates. Monitor
+  // positions use the same coordinate system.
   property real cursorX: 0
   property real cursorY: 0
   property bool tracking: false
 
-  // Looked up per sample rather than bound: QsWindow is an attached property
-  // that does not exist yet while the widget is being built, and a binding
-  // that reads it too early would latch onto null and never look again.
+  // Resolve QsWindow for each sample. The attached property may not exist
+  // while QML creates the widget, and an early binding can remain null.
   function hostWindow() {
     return root.QsWindow ? root.QsWindow.window : null
   }
 
-  // mapToItem() is not a reactive binding, so a bar that moves or resizes
-  // under a still cursor needs a nudge to recompute the stare.
+  // mapToItem() is not reactive. Increment this value when the bar moves or
+  // resizes so pupilOffset() runs again while the cursor is stationary.
   property int layoutRevision: 0
   onUnitXChanged: layoutRevision++
   onUnitYChanged: layoutRevision++
@@ -107,11 +98,10 @@ BarWidget {
     return { "x": 0, "y": 0 }
   }
 
-  // Pupil offset for one eye, in the drawing's own pixels, as xeyes computes
-  // it: the cursor is converted into xeyes units per axis first, which is what
-  // makes a stretched eye look along the stretched geometry.
+  // Convert the cursor to xeyes units before calculating the pupil offset.
+  // Separate axis units preserve the direction inside a stretched eye.
   function pupilOffset(index) {
-    var revision = layoutRevision // dependency: recompute when the bar moves
+    var revision = layoutRevision // Recompute when the bar moves.
     if (!tracking) return { "x": 0, "y": 0 }
 
     var window = hostWindow()
@@ -136,8 +126,7 @@ BarWidget {
     }
 
     var offset = Eyes.pupilOffset((cursorX - eyeX) / unitX, (cursorY - eyeY) / unitY, rect)
-    // Laid out in unitX and squashed to unitY by eyeField's transform, so the
-    // y offset is carried in the same units as everything else in there.
+    // eyeField applies the unitY scale later, so both offsets use unitX here.
     return { "x": offset.x * unitX, "y": offset.y * unitX }
   }
 
@@ -177,8 +166,7 @@ BarWidget {
     height: Math.round(root.eyeHeight)
     rotation: root.vertical ? 90 : 0
 
-    // The eyes are drawn round, in unitX, and this squashes them to unitY —
-    // one transform standing in for xeyes' two-axis SetTransform.
+    // Draw circles in unitX, then scale the vertical axis to unitY.
     Item {
       id: eyeField
       anchors.centerIn: parent
@@ -210,8 +198,7 @@ BarWidget {
           width: diameter
           height: diameter
 
-          // The rim is the black disc showing around the white one, exactly
-          // the way Eyes.c layers the two ellipses.
+          // Draw the rim behind the smaller eye disc, as Eyes.c does.
           Rectangle {
             anchors.fill: parent
             radius: width / 2.0
@@ -237,8 +224,7 @@ BarWidget {
             x: (eye.width - width) / 2.0 + eye.offset.x
             y: (eye.height - height) / 2.0 + eye.offset.y
 
-            // Samples land on frame boundaries; a short glide keeps a fast
-            // flick across the screen from looking stepped.
+            // Interpolate between samples to reduce visible stepping.
             Behavior on x { enabled: root.tracking; NumberAnimation { duration: 45; easing.type: Easing.Linear } }
             Behavior on y { enabled: root.tracking; NumberAnimation { duration: 45; easing.type: Easing.Linear } }
           }
