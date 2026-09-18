@@ -14,7 +14,7 @@ Plugin ID: `jesusarchive.eyes`
 - Rotates the pair on a vertical bar while keeping the pupils aimed at the pointer.
 - Skips duplicate position updates, so a stationary pointer does not trigger QML redraws.
 
-The default eye shape matches the original xeyes window. Xeyes maps a 3.8 by 1.8 drawing onto a 150 by 100 window with separate horizontal and vertical scales. This stretches the circles into the familiar egg shape. Set `shape` to `round` to use circles instead.
+The eye shape matches the original xeyes window. Xeyes maps a 3.8 by 1.8 drawing onto a 150 by 100 window with separate horizontal and vertical scales. This stretches the circles into the familiar egg shape.
 
 ## Requirements
 
@@ -87,10 +87,14 @@ The drawing uses the constants and pupil calculation from X.Org's `Eyes.c`:
 | `BALL_DIST` | `0.4` | Maximum pupil travel from the centre. |
 | `EYE_OFFSET` | `0.1` | Padding between the eyes. |
 
+## Inspiration
+
+[X.Org xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes) is the source of the eye geometry and pupil movement used here.
+
 ## License and credit
 
 The plugin is released under the MIT license in [`LICENSE`](LICENSE). Code
 adapted from xeyes retains its upstream notice in
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-The eye geometry and pupil calculation in `Eyes.js` are adapted from X.Org's [`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c), copyright X Consortium and q3k. Xeyes was written by Keith Packard and Jim Gettys. Xfce also provides an eyes panel widget through `xfce4-eyes-plugin`.
+The eye geometry and pupil calculation in `Eyes.js` are adapted from X.Org's [`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c), copyright X Consortium and q3k. Xeyes was written by Keith Packard and Jim Gettys.
