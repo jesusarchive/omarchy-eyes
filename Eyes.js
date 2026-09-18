@@ -18,12 +18,6 @@ var SPACING = 2.0
 var BBOX_W = SPACING + OUTER_DIAM                        // 3.8
 var BBOX_H = OUTER_DIAM                                  // 1.8
 
-// AngleBetween() from Eyes.c: the arc from A0 to A1 going counterclockwise,
-// which wraps around ±pi whenever A0 > A1.
-function angleBetween(a, a0, a1) {
-  return a0 <= a1 ? (a0 <= a && a <= a1) : (a0 <= a || a <= a1)
-}
-
 // computePupil() from Eyes.c, in eye-local units: dx/dy point from the eye
 // centre to the cursor and the result is the pupil's offset from that centre.
 //
@@ -42,12 +36,15 @@ function pupilOffset(dx, dy, screen) {
     var y0 = screen.y
     var x1 = x0 + screen.width
     var y1 = y0 + screen.height
-    var a = [Math.atan2(y0, x0), Math.atan2(y1, x0), Math.atan2(y1, x1), Math.atan2(y0, x1)]
-    if (angleBetween(angle, a[0], a[1])) dist *= dx / x0        // left edge
-    else if (angleBetween(angle, a[1], a[2])) dist *= dy / y1   // bottom edge
-    else if (angleBetween(angle, a[2], a[3])) dist *= dx / x1   // right edge
-    else if (angleBetween(angle, a[3], a[0])) dist *= dy / y0   // top edge
-    if (dist > BALL_DIST) dist = BALL_DIST
+    var xEdge = dx < 0 ? x0 : x1
+    var yEdge = dy < 0 ? y0 : y1
+    var xRatio = dx === 0 || xEdge === 0 ? 0 : dx / xEdge
+    var yRatio = dy === 0 || yEdge === 0 ? 0 : dy / yEdge
+
+    // The ray reaches the first screen edge at the larger axis ratio. Using
+    // both axes here also keeps the direction stable in every quadrant.
+    var screenFraction = Math.max(0, Math.min(1, Math.max(xRatio, yRatio)))
+    dist *= screenFraction
   }
 
   // Closer than the pupil can travel, the pupil sits on the cursor itself —

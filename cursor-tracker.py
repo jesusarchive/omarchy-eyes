@@ -7,10 +7,10 @@ client pointer events only while the pointer is over its own surface, so the
 eyes have to ask the compositor instead: Hyprland answers `cursorpos` on its
 request socket, in the same layout coordinates the monitors are placed in.
 
-Hyprland closes the connection after each reply, so this reconnects per poll —
-about 30us of work per sample, versus ~4ms to spawn `hyprctl` for the same
-answer. Unchanged positions are not printed, so an idle cursor costs the
-widget nothing.
+Hyprland closes the connection after each reply, so this reconnects for every
+poll. It talks to the socket directly instead of starting `hyprctl` for every
+sample. Unchanged positions are not printed, which avoids duplicate widget
+updates.
 
 Usage: cursor-tracker.py <request-socket-path> [interval-seconds]
 """
@@ -18,8 +18,19 @@ Usage: cursor-tracker.py <request-socket-path> [interval-seconds]
 import socket
 import sys
 import time
+from math import isfinite
 
 RETRY_DELAY = 1.0
+
+
+def parse_interval(value):
+    try:
+        interval = float(value)
+    except (TypeError, ValueError) as error:
+        raise ValueError("interval must be a number greater than zero") from error
+    if not isfinite(interval) or interval <= 0:
+        raise ValueError("interval must be a number greater than zero")
+    return interval
 
 
 def poll(path):
@@ -33,7 +44,10 @@ def main():
     if len(sys.argv) < 2:
         sys.exit("usage: cursor-tracker.py <request-socket-path> [interval-seconds]")
     path = sys.argv[1]
-    interval = float(sys.argv[2]) if len(sys.argv) > 2 else 1.0 / 60.0
+    try:
+        interval = parse_interval(sys.argv[2]) if len(sys.argv) > 2 else 1.0 / 60.0
+    except ValueError as error:
+        sys.exit(str(error))
 
     last = None
     while True:

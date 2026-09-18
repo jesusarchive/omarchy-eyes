@@ -1,55 +1,46 @@
 # Eyes for Omarchy
 
-[xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes), in the
-[Omarchy](https://omarchy.org) bar, following the pointer across every monitor.
-Plugin ID: `jesusarchive.eyes`. MIT licensed.
+Eyes puts a pair of [xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes) in the [Omarchy](https://omarchy.org) bar. The pupils follow the pointer across every monitor.
 
-![xeyes in the bar](assets/screenshot.png)
+Plugin ID: `jesusarchive.eyes`
 
-The eyes are not a redraw from memory. The rim thickness, the white, the pupil
-and how far it travels are the constants out of x.org's `Eyes.c`, and the
-pupil's position is `computePupil()` ported line for line:
+![Eyes in the Omarchy bar](assets/screenshot.png)
 
-| Constant | Value | What it is |
-|---|---|---|
-| `EYE_THICK` | `0.175` | thickness of the rim |
-| `EYE_DIAM` | `1.45` | the white of the eye |
-| `BALL_DIAM` | `0.3` | the pupil |
-| `BALL_DIST` | `0.4` | how far the pupil travels from the centre |
-| `EYE_OFFSET` | `0.1` | padding between the two eyes |
+## What it does
 
-They are egg-shaped for the same reason the real ones are: xeyes maps its
-3.8 × 1.8 bounding box onto the window with a separate scale per axis, so its
-default 150 × 100 window stretches the circles vertically by 1.407. Set `shape`
-to `round` to opt out.
+- Tracks the pointer across the full Hyprland monitor layout, not only while it is over the bar.
+- Reproduces the dimensions and pupil movement from X.Org's `Eyes.c`.
+- Goes cross-eyed when the pointer moves closer than the pupil's maximum travel.
+- Rotates the pair on a vertical bar while keeping the pupils aimed at the pointer.
+- Skips duplicate position updates, so a stationary pointer does not trigger QML redraws.
 
-- Follows the pointer anywhere on any monitor, not only over the bar.
-- Goes cross-eyed when the pointer is closer than the pupil can travel, like
-  the original.
-- Turns a quarter turn on a vertical bar, and the pupils keep aiming at the
-  real cursor.
-- Costs nothing while the cursor is still: unchanged positions are never sent.
+The default eye shape matches the original xeyes window. Xeyes maps a 3.8 by 1.8 drawing onto a 150 by 100 window with separate horizontal and vertical scales. This stretches the circles into the familiar egg shape. Set `shape` to `round` to use circles instead.
 
-## Following the cursor on Wayland
+## Requirements
 
-Under X11 any client could ask the server where the pointer was, which is how
-xeyes watched a cursor nowhere near its own window. Wayland deliberately does
-not allow that — a client gets pointer events only while the pointer is over
-its own surface — so the eyes ask the compositor instead. `cursor-tracker.py`
-polls Hyprland's `cursorpos` on its request socket and streams changes to the
-widget.
+- Omarchy Quattro with the Omarchy Shell plugin system.
+- Hyprland.
+- `/usr/bin/python3`.
 
-That costs about 30µs per sample, against roughly 4ms to spawn `hyprctl` for
-the same answer, which is why it is a small resident helper rather than a
-shell loop. It needs `/usr/bin/python3`, and nothing else.
+The plugin does not install packages, modify system files, or require elevated privileges.
 
 ## Install
+
+Install and enable the plugin from GitHub:
 
 ```bash
 omarchy plugin add https://github.com/jesusarchive/omarchy-eyes.git --enable
 ```
 
-Manual install from a checkout:
+Omarchy places the widget in its default `left` section. Move it with:
+
+```bash
+omarchy bar move jesusarchive.eyes --section right
+```
+
+Valid sections are `left`, `center`, and `right`.
+
+### Install from a local checkout
 
 ```bash
 omarchy plugin validate .
@@ -58,37 +49,71 @@ rsync -a --delete --exclude .git ./ ~/.config/omarchy/plugins/jesusarchive.eyes/
 omarchy plugin enable jesusarchive.eyes left
 ```
 
-Move it with `omarchy bar move jesusarchive.eyes --section <left|center|right>`,
-and take it off the bar with `omarchy plugin disable jesusarchive.eyes`.
-Shell plugins hot-reload, so code edits land without a restart — but a widget
-already on the bar keeps the instance it was built from, so run
-`omarchy restart shell` when a change does not show up.
+## Configure
 
-## Settings
-
-Set them with `omarchy bar set jesusarchive.eyes <key> <value>`, or from the
-bar widget settings panel.
-
-| Key | Default | What it does |
-|---|---|---|
-| `fps` | `60` | Cursor samples per second. |
-| `size` | `0` | Height of the eyes in pixels. `0` fits them to the bar. |
-| `shape` | `stretched` | `stretched` for the shape xeyes gives its eyes, `round` for circles. |
-| `distance` | `Off` | xeyes' `-distance`: pupil travel scales with how far across the screen the cursor is. |
-| `outline` | `""` | Rim colour. Empty is xeyes' black; `theme` follows the bar. |
-| `center` | `""` | The white of the eye. Empty is xeyes' white; `theme` follows the bar. |
-| `pupil` | `""` | Pupil colour. Empty is xeyes' black; `theme` follows the bar. |
-| `onClick` | `""` | Shell command to run on left click. |
+Change settings from the bar widget settings panel or the command line:
 
 ```bash
-omarchy bar set jesusarchive.eyes distance On
 omarchy bar set jesusarchive.eyes shape round
+omarchy bar set jesusarchive.eyes distance On
 omarchy bar set jesusarchive.eyes pupil theme
 ```
 
-## Credit
+| Key | Default | Description |
+|---|---|---|
+| `fps` | `60` | Number of cursor samples per second, from `1` to `144`. |
+| `size` | `0` | Eye height in pixels, from `0` to `400`. A value of `0` fits the eyes to the bar. |
+| `shape` | `stretched` | Use `stretched` for the original xeyes proportions or `round` for circles. |
+| `distance` | `Off` | Use `On` to scale pupil travel by the pointer's distance across the screen. This matches xeyes' `-distance` option. |
+| `outline` | `""` | Rim colour. An empty value uses black. Use `theme` for the bar foreground or supply a colour value. |
+| `center` | `""` | Eye colour. An empty value uses white. Use `theme` for the bar background or supply a colour value. |
+| `pupil` | `""` | Pupil colour. An empty value uses black. Use `theme` for the bar foreground or supply a colour value. |
+| `onClick` | `""` | Command to run on left click. An empty value disables the click action. |
 
-xeyes is part of X.Org, written by Keith Packard and Jim Gettys, and the eyes
-are theirs. The geometry and pupil math here are ported from `Eyes.c`; the MIT
-licence in `LICENSE` covers this plugin's code. The Xfce panel had the same
-idea for years as `xfce4-eyes-plugin`.
+To restore a setting, set it back to the default value shown above.
+
+## Disable or remove
+
+Remove the widget from the bar without deleting its files:
+
+```bash
+omarchy plugin disable jesusarchive.eyes
+```
+
+Delete the installed plugin:
+
+```bash
+omarchy plugin remove jesusarchive.eyes
+```
+
+## How cursor tracking works
+
+Wayland clients receive pointer events only while the pointer is over one of their surfaces. That prevents the QML widget from tracking the pointer across the desktop by itself.
+
+`cursor-tracker.py` polls Hyprland's `cursorpos` request through its Unix socket. It sends a new position to the widget only when the coordinates change. The default rate is 60 samples per second. The helper uses Python's standard library and does not call `hyprctl` for each sample.
+
+The shell reloads plugin files after changes. If an existing widget instance does not update, restart the shell:
+
+```bash
+omarchy restart shell
+```
+
+## xeyes geometry
+
+The drawing uses the constants and pupil calculation from X.Org's `Eyes.c`:
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `EYE_THICK` | `0.175` | Rim thickness. |
+| `EYE_DIAM` | `1.45` | Diameter of the white area. |
+| `BALL_DIAM` | `0.3` | Pupil diameter. |
+| `BALL_DIST` | `0.4` | Maximum pupil travel from the centre. |
+| `EYE_OFFSET` | `0.1` | Padding between the eyes. |
+
+## License and credit
+
+The plugin is released under the MIT license in [`LICENSE`](LICENSE). Code
+adapted from xeyes retains its upstream notice in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+The eye geometry and pupil calculation in `Eyes.js` are adapted from X.Org's [`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c), copyright X Consortium and q3k. Xeyes was written by Keith Packard and Jim Gettys. Xfce also provides an eyes panel widget through `xfce4-eyes-plugin`.
