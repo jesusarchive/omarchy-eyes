@@ -46,18 +46,3 @@ test("a distant cursor clamps pupil travel in each direction", () => {
     closeTo(result.y, expectedY);
   }
 });
-
-test("distance mode keeps the pupil direction at each screen edge", () => {
-  const screen = { x: -10, y: -10, width: 20, height: 20 };
-  const cases = [
-    [5, 0, eyes.BALL_DIST / 2, 0],
-    [-5, 0, -eyes.BALL_DIST / 2, 0],
-    [0, 5, 0, eyes.BALL_DIST / 2],
-    [0, -5, 0, -eyes.BALL_DIST / 2],
-  ];
-  for (const [dx, dy, expectedX, expectedY] of cases) {
-    const result = eyes.pupilOffset(dx, dy, screen);
-    closeTo(result.x, expectedX);
-    closeTo(result.y, expectedY);
-  }
-});

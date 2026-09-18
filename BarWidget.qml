@@ -14,27 +14,12 @@ BarWidget {
   id: root
   moduleName: "jesusarchive.eyes"
 
-  function clamped(value, min, max, fallback) {
-    var n = Number(value)
-    if (!isFinite(n)) return fallback
-    return Math.max(min, Math.min(max, n))
-  }
+  readonly property real eyeHeight: Math.max(8, barSize - 8)
 
-  // Number of Hyprland cursor-position requests per second. The helper does
-  // not send duplicate positions to the widget.
-  readonly property int fps: clamped(setting("fps", 60), 1, 144, 60)
-
-  // Height of the eyes in bar pixels. 0 fits them to the bar.
-  readonly property real eyeHeight: {
-    var explicit = clamped(setting("size", 0), 0, 400, 0)
-    return explicit > 0 ? explicit : Math.max(8, barSize - 8)
-  }
-
-  // xeyes maps its 3.8 x 1.8 bounds onto the window with separate horizontal
-  // and vertical scales. Its default 150x100 window turns the circles into
-  // ellipses. The "round" setting uses the aspect ratio of the source bounds.
-  readonly property bool round: String(setting("shape", "stretched")) === "round"
-  readonly property real drawAspect: round ? Eyes.BBOX_W / Eyes.BBOX_H : 150.0 / 100.0
+  // xeyes maps its 3.8 x 1.8 bounds onto its default 150x100 window with
+  // separate horizontal and vertical scales. This turns the circles into
+  // ellipses.
+  readonly property real drawAspect: 150.0 / 100.0
   readonly property real drawWidth: eyeHeight * drawAspect
 
   // unitX and unitY convert xeyes units to bar pixels. The drawing uses unitX
@@ -42,28 +27,6 @@ BarWidget {
   readonly property real unitX: drawWidth / Eyes.BBOX_W
   readonly property real unitY: eyeHeight / Eyes.BBOX_H
   readonly property real centreInset: (1.0 - Eyes.EYE_OFFSET) * unitX
-
-  // xeyes' -distance option scales pupil travel by the cursor's distance from
-  // the eye. Both xeyes and this plugin disable it by default.
-  readonly property bool distance: {
-    var value = setting("distance", "Off")
-    return value === true || String(value) === "On"
-  }
-
-  readonly property string clickCommand: String(setting("onClick", ""))
-
-  // xeyes uses black for the rim and pupil, and white for the eye. The value
-  // "theme" replaces those defaults with the bar colours.
-  function resolveColor(name, xeyesDefault, themeColor) {
-    var value = String(setting(name, ""))
-    if (value === "") return xeyesDefault
-    if (value === "theme") return themeColor
-    return value
-  }
-
-  readonly property color outlineColor: resolveColor("outline", "black", bar ? bar.barForeground : "black")
-  readonly property color centerColor: resolveColor("center", "white", bar ? bar.background : "white")
-  readonly property color pupilColor: resolveColor("pupil", "black", bar ? bar.barForeground : "black")
 
   // Hyprland reports the cursor in global layout coordinates. Monitor
   // positions use the same coordinate system.
@@ -115,17 +78,7 @@ BarWidget {
     var eyeX = screen.x + origin.x + local.x
     var eyeY = screen.y + origin.y + local.y
 
-    var rect = null
-    if (distance) {
-      rect = {
-        "x": (screen.x - eyeX) / unitX,
-        "y": (screen.y - eyeY) / unitY,
-        "width": screen.width / unitX,
-        "height": screen.height / unitY
-      }
-    }
-
-    var offset = Eyes.pupilOffset((cursorX - eyeX) / unitX, (cursorY - eyeY) / unitY, rect)
+    var offset = Eyes.pupilOffset((cursorX - eyeX) / unitX, (cursorY - eyeY) / unitY)
     // eyeField applies the unitY scale later, so both offsets use unitX here.
     return { "x": offset.x * unitX, "y": offset.y * unitX }
   }
@@ -140,7 +93,7 @@ BarWidget {
       "/usr/bin/python3",
       String(Qt.resolvedUrl("cursor-tracker.py")).replace(/^file:\/\//, ""),
       Hyprland.requestSocketPath,
-      String(1.0 / root.fps)
+      String(1.0 / 60.0)
     ]
 
     stdout: SplitParser {
@@ -202,7 +155,7 @@ BarWidget {
           Rectangle {
             anchors.fill: parent
             radius: width / 2.0
-            color: root.outlineColor
+            color: "black"
             antialiasing: true
 
             Rectangle {
@@ -210,7 +163,7 @@ BarWidget {
               width: Eyes.EYE_DIAM * root.unitX
               height: width
               radius: width / 2.0
-              color: root.centerColor
+              color: "white"
               antialiasing: true
             }
           }
@@ -219,7 +172,7 @@ BarWidget {
             width: Eyes.BALL_DIAM * root.unitX
             height: width
             radius: width / 2.0
-            color: root.pupilColor
+            color: "black"
             antialiasing: true
             x: (eye.width - width) / 2.0 + eye.offset.x
             y: (eye.height - height) / 2.0 + eye.offset.y
@@ -236,10 +189,8 @@ BarWidget {
   MouseArea {
     anchors.fill: parent
     hoverEnabled: true
-    acceptedButtons: Qt.LeftButton
-    cursorShape: root.clickCommand !== "" ? Qt.PointingHandCursor : Qt.ArrowCursor
+    acceptedButtons: Qt.NoButton
 
-    onClicked: if (root.clickCommand !== "" && root.bar) root.bar.run(root.clickCommand)
     onEntered: if (root.bar) root.bar.showTooltip(root, "Eyes")
     onExited: if (root.bar) root.bar.hideTooltip(root)
   }

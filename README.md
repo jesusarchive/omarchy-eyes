@@ -49,29 +49,6 @@ rsync -a --delete --exclude .git ./ ~/.config/omarchy/plugins/jesusarchive.eyes/
 omarchy plugin enable jesusarchive.eyes left
 ```
 
-## Configure
-
-Change settings from the bar widget settings panel or the command line:
-
-```bash
-omarchy bar set jesusarchive.eyes shape round
-omarchy bar set jesusarchive.eyes distance On
-omarchy bar set jesusarchive.eyes pupil theme
-```
-
-| Key | Default | Description |
-|---|---|---|
-| `fps` | `60` | Number of cursor samples per second, from `1` to `144`. |
-| `size` | `0` | Eye height in pixels, from `0` to `400`. A value of `0` fits the eyes to the bar. |
-| `shape` | `stretched` | Use `stretched` for the original xeyes proportions or `round` for circles. |
-| `distance` | `Off` | Use `On` to scale pupil travel by the pointer's distance across the screen. This matches xeyes' `-distance` option. |
-| `outline` | `""` | Rim colour. An empty value uses black. Use `theme` for the bar foreground or supply a colour value. |
-| `center` | `""` | Eye colour. An empty value uses white. Use `theme` for the bar background or supply a colour value. |
-| `pupil` | `""` | Pupil colour. An empty value uses black. Use `theme` for the bar foreground or supply a colour value. |
-| `onClick` | `""` | Command to run on left click. An empty value disables the click action. |
-
-To restore a setting, set it back to the default value shown above.
-
 ## Disable or remove
 
 Remove the widget from the bar without deleting its files:

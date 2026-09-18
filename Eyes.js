@@ -19,30 +19,11 @@ var BBOX_H = OUTER_DIAM                                  // 1.8
 
 // Adapt computePupil() from Eyes.c. dx and dy point from the eye centre to the
 // cursor. The result is the pupil's offset from the eye centre.
-//
-// Pass screen bounds relative to the eye centre to enable xeyes' -distance
-// behaviour. It scales pupil travel by the cursor's distance across the
-// screen. Xeyes disables this option by default.
-function pupilOffset(dx, dy, screen) {
+function pupilOffset(dx, dy) {
   if (dx === 0 && dy === 0) return { x: 0, y: 0 }
 
   var angle = Math.atan2(dy, dx)
   var dist = BALL_DIST
-
-  if (screen) {
-    var x0 = screen.x
-    var y0 = screen.y
-    var x1 = x0 + screen.width
-    var y1 = y0 + screen.height
-    var xEdge = dx < 0 ? x0 : x1
-    var yEdge = dy < 0 ? y0 : y1
-    var xRatio = dx === 0 || xEdge === 0 ? 0 : dx / xEdge
-    var yRatio = dy === 0 || yEdge === 0 ? 0 : dy / yEdge
-
-    // The larger axis ratio identifies the first screen edge hit by the ray.
-    var screenFraction = Math.max(0, Math.min(1, Math.max(xRatio, yRatio)))
-    dist *= screenFraction
-  }
 
   // Place the pupil on a nearby cursor. This produces xeyes' cross-eyed state.
   if (dist > Math.hypot(dx, dy)) return { x: dx, y: dy }

@@ -18,12 +18,10 @@ class ManifestTests(unittest.TestCase):
         entry_point = self.manifest["entryPoints"]["barWidget"]
         self.assertTrue((ROOT / entry_point).is_file())
 
-    def test_defaults_match_schema(self):
-        defaults = self.manifest["barWidget"]["defaults"]
-        schema = self.manifest["barWidget"]["schema"]
-        self.assertEqual(set(defaults), {item["key"] for item in schema})
-        for item in schema:
-            self.assertEqual(defaults[item["key"]], item["defaultValue"])
+    def test_widget_has_no_settings(self):
+        widget = self.manifest["barWidget"]
+        self.assertNotIn("defaults", widget)
+        self.assertNotIn("schema", widget)
 
 
 if __name__ == "__main__":
