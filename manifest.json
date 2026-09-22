@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "jesusarchive",
   "license": "MIT",
-  "description": "Two eyes in the Omarchy bar that track the pointer across every monitor.",
+  "description": "Two xeyes-style eyes in the Omarchy bar that track the pointer across every monitor.",
   "kinds": [
     "bar-widget"
   ],
@@ -14,16 +14,8 @@
   },
   "barWidget": {
     "displayName": "Eyes",
-    "description": "Two xeyes-style eyes that track the pointer across every monitor. The drawing uses the proportions from X.Org's Eyes.c. The pair rotates when the bar is vertical.",
+    "description": "Two xeyes-style eyes that track the pointer across every monitor and rotate with a vertical bar.",
     "category": "Fun",
-    "aliases": [
-      "eyes",
-      "xeyes",
-      "ojos",
-      "cursor",
-      "mouse",
-      "googly"
-    ],
     "allowMultiple": false,
     "defaultSection": "left"
   }
