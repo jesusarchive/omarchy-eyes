@@ -4,7 +4,7 @@ Eyes puts a pair of [xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes) in th
 
 Plugin ID: `jesusarchive.eyes`
 
-![Eyes in the Omarchy bar](assets/screenshot.png)
+![Eyes in the Omarchy bar](preview.png)
 
 ## What it does
 
