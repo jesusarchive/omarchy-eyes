@@ -20,14 +20,6 @@ Install and enable the plugin from GitHub:
 omarchy plugin add https://github.com/jesusarchive/omarchy-eyes.git --enable
 ```
 
-The widget starts in the `left` section. Move it with:
-
-```bash
-omarchy bar move jesusarchive.eyes --section right
-```
-
-Valid sections are `left`, `center`, and `right`.
-
 ## Disable or remove
 
 Remove the widget from the bar without deleting its files:
