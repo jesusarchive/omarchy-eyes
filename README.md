@@ -1,23 +1,16 @@
 # Eyes for Omarchy
 
-Eyes puts a pair of [xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes) in the [Omarchy](https://omarchy.org) bar. The pupils follow the pointer across every monitor.
+Eyes adds a pair of animated eyes to the [Omarchy](https://omarchy.org) bar. The pupils follow the pointer across every monitor, and the widget adapts to horizontal and vertical bars.
 
 ![Eyes in the Omarchy bar](preview.png)
-
-## Features
-
-- Tracks the pointer throughout the Hyprland monitor layout, including when it is outside the bar.
-- Goes cross-eyed when the pointer moves closer than the pupil's maximum travel.
-- Rotates the pair on a vertical bar while keeping the pupils aimed at the pointer.
-- Uses the eye proportions and pupil movement from X.Org's `Eyes.c`.
 
 ## Requirements
 
 - Omarchy Quattro with the Omarchy Shell plugin system.
 - Hyprland.
-- `/usr/bin/python3`.
+- Python 3 at `/usr/bin/python3`.
 
-The plugin does not install packages, modify system files, or require elevated privileges.
+The plugin does not install dependencies or require elevated privileges.
 
 ## Installation
 
@@ -27,24 +20,13 @@ Install and enable the plugin from GitHub:
 omarchy plugin add https://github.com/jesusarchive/omarchy-eyes.git --enable
 ```
 
-Omarchy places the widget in its default `left` section. Move it with:
+The widget starts in the `left` section. Move it with:
 
 ```bash
 omarchy bar move jesusarchive.eyes --section right
 ```
 
 Valid sections are `left`, `center`, and `right`.
-
-### Local development
-
-Validate and install a local checkout with:
-
-```bash
-omarchy plugin validate .
-mkdir -p ~/.config/omarchy/plugins/jesusarchive.eyes
-rsync -a --delete --exclude .git ./ ~/.config/omarchy/plugins/jesusarchive.eyes/
-omarchy plugin enable jesusarchive.eyes left
-```
 
 ## Disable or remove
 
@@ -60,24 +42,6 @@ Delete the installed plugin:
 omarchy plugin remove jesusarchive.eyes
 ```
 
-## Cursor tracking
-
-Wayland clients receive pointer events only while the pointer is over one of their surfaces. That prevents the QML widget from tracking the pointer across the desktop by itself.
-
-`cursor-tracker.py` polls Hyprland's `cursorpos` request through its Unix socket at 60 samples per second. It sends a position to the widget only when the coordinates change. The helper uses Python's standard library and reads the socket directly instead of starting `hyprctl` for each sample.
-
-## xeyes geometry
-
-The drawing uses the constants and pupil calculation from X.Org's `Eyes.c`. Xeyes maps a 3.8 by 1.8 drawing onto a 150 by 100 window with separate horizontal and vertical scales, which makes each eye taller relative to its width.
-
-| Constant | Value | Meaning |
-|---|---|---|
-| `EYE_THICK` | `0.175` | Rim thickness. |
-| `EYE_DIAM` | `1.45` | Diameter of the white area. |
-| `BALL_DIAM` | `0.3` | Pupil diameter. |
-| `BALL_DIST` | `0.4` | Maximum pupil travel from the centre. |
-| `EYE_OFFSET` | `0.1` | Padding between the eyes. |
-
 ## License and attribution
 
-The [`LICENSE`](LICENSE) file contains the plugin's MIT license. [`Eyes.js`](Eyes.js) adapts the eye geometry and pupil calculation from X.Org's [`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c). X Consortium and q3k hold copyrights in that code. [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) preserves the upstream license notice. Keith Packard and Jim Gettys wrote xeyes.
+The plugin is licensed under the [MIT License](LICENSE). Its eye geometry and pupil movement are adapted from X.Org's [`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c). See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the upstream license and copyright notices.
