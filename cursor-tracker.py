@@ -8,7 +8,7 @@ coordinates use the monitor layout's coordinate system.
 
 Hyprland closes the connection after each reply, so this reconnects for every
 poll. It talks to the socket directly instead of starting `hyprctl` for every
-sample. Unchanged positions are not printed, which avoids duplicate widget
+sample. The helper prints only changed positions to avoid duplicate widget
 updates.
 
 Usage: cursor-tracker.py <request-socket-path> [interval-seconds]

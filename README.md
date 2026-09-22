@@ -8,13 +8,13 @@ Plugin ID: `jesusarchive.eyes`
 
 ## What it does
 
-- Tracks the pointer across the full Hyprland monitor layout, not only while it is over the bar.
+- Tracks the pointer throughout the Hyprland monitor layout, including when it is outside the bar.
 - Reproduces the dimensions and pupil movement from X.Org's `Eyes.c`.
 - Goes cross-eyed when the pointer moves closer than the pupil's maximum travel.
 - Rotates the pair on a vertical bar while keeping the pupils aimed at the pointer.
 - Skips duplicate position updates, so a stationary pointer does not trigger QML redraws.
 
-The eye shape matches the original xeyes window. Xeyes maps a 3.8 by 1.8 drawing onto a 150 by 100 window with separate horizontal and vertical scales. This stretches the circles into the familiar egg shape.
+The eye shape matches the original xeyes window. Xeyes maps a 3.8 by 1.8 drawing onto a 150 by 100 window with separate horizontal and vertical scales. This makes each eye taller relative to its width.
 
 ## Requirements
 
@@ -67,7 +67,7 @@ omarchy plugin remove jesusarchive.eyes
 
 Wayland clients receive pointer events only while the pointer is over one of their surfaces. That prevents the QML widget from tracking the pointer across the desktop by itself.
 
-`cursor-tracker.py` polls Hyprland's `cursorpos` request through its Unix socket. It sends a new position to the widget only when the coordinates change. The default rate is 60 samples per second. The helper uses Python's standard library and does not call `hyprctl` for each sample.
+`cursor-tracker.py` polls Hyprland's `cursorpos` request through its Unix socket. It sends a new position to the widget only when the coordinates change. The default rate is 60 samples per second. The helper uses Python's standard library and reads the socket directly instead of starting `hyprctl` for each sample.
 
 The shell reloads plugin files after changes. If an existing widget instance does not update, restart the shell:
 
@@ -87,14 +87,11 @@ The drawing uses the constants and pupil calculation from X.Org's `Eyes.c`:
 | `BALL_DIST` | `0.4` | Maximum pupil travel from the centre. |
 | `EYE_OFFSET` | `0.1` | Padding between the eyes. |
 
-## Inspiration
+## License and attribution
 
-[X.Org xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes) is the source of the eye geometry and pupil movement used here.
-
-## License and credit
-
-The plugin is released under the MIT license in [`LICENSE`](LICENSE). Code
-adapted from xeyes retains its upstream notice in
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
-
-The eye geometry and pupil calculation in `Eyes.js` are adapted from X.Org's [`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c), copyright X Consortium and q3k. Xeyes was written by Keith Packard and Jim Gettys.
+The [`LICENSE`](LICENSE) file contains the plugin's MIT license. `Eyes.js`
+adapts the eye geometry and pupil calculation from X.Org's
+[`Eyes.c`](https://gitlab.freedesktop.org/xorg/app/xeyes/-/blob/master/Eyes.c).
+X Consortium and q3k hold copyrights in that code.
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) preserves the upstream
+license notice. Keith Packard and Jim Gettys wrote xeyes.

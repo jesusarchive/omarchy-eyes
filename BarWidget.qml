@@ -52,8 +52,8 @@ BarWidget {
     function onPositionChanged() { root.layoutRevision++ }
   }
 
-  // A bar panel spans its edge, so its window sits at the screen origin
-  // unless it is anchored to the far edge.
+  // A bar panel spans its edge. Top and left bars start at the screen origin;
+  // bottom and right bars need an offset to reach the far edge.
   function windowOrigin(window, screen) {
     var side = bar ? bar.position : "top"
     if (side === "bottom") return { "x": 0, "y": screen.height - window.height }
