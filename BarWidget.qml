@@ -5,11 +5,8 @@ import Quickshell.Io
 import qs.Ui
 import "Eyes.js" as Eyes
 
-// Draw two xeyes-style eyes in the bar and point them at the cursor.
-//
-// Eyes.js adapts the proportions and pupil calculation from Eyes.c. X11 lets
-// xeyes query the pointer directly. Wayland does not, so cursor-tracker.py
-// reads Hyprland's `cursorpos` response instead.
+// Wayland does not expose the global pointer position to QML, so
+// cursor-tracker.py reads Hyprland's `cursorpos` response.
 BarWidget {
   id: root
   moduleName: "jesusarchive.eyes"
@@ -119,7 +116,6 @@ BarWidget {
     height: Math.round(root.eyeHeight)
     rotation: root.vertical ? 90 : 0
 
-    // Draw circles in unitX, then scale the vertical axis to unitY.
     Item {
       id: eyeField
       anchors.centerIn: parent
@@ -151,7 +147,6 @@ BarWidget {
           width: diameter
           height: diameter
 
-          // Draw the rim behind the smaller eye disc, as Eyes.c does.
           Rectangle {
             anchors.fill: parent
             radius: width / 2.0

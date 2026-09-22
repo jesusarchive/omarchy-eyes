@@ -1,11 +1,11 @@
 .pragma library
 
-// Geometry and pupil calculations adapted from x.org app/xeyes 1.3.0,
-// Eyes.c. xeyes gives each eye a 2.0-unit-wide cell. The widget scales these
-// units to the bar height.
+// This file adapts the geometry and pupil calculation from X.Org xeyes 1.3.0
+// Eyes.c. Xeyes gives each eye a 2.0-unit-wide cell, which the widget scales
+// to the bar height.
 var EYE_OFFSET = 0.1                                     // padding between eyes
 var EYE_THICK = 0.175                                    // thickness of the rim
-var BALL_DIAM = 0.3                                      // the pupil
+var BALL_DIAM = 0.3                                      // pupil diameter
 var BALL_PAD = 0.175                                     // pupil clearance inside the white
 var EYE_DIAM = 2.0 - (EYE_THICK + EYE_OFFSET) * 2.0      // 1.45, the white of the eye
 var OUTER_DIAM = EYE_DIAM + 2.0 * EYE_THICK              // 1.8, rim included
@@ -17,8 +17,8 @@ var SPACING = 2.0
 var BBOX_W = SPACING + OUTER_DIAM                        // 3.8
 var BBOX_H = OUTER_DIAM                                  // 1.8
 
-// Adapt computePupil() from Eyes.c. dx and dy point from the eye centre to the
-// cursor. The result is the pupil's offset from the eye centre.
+// This function adapts computePupil() from Eyes.c. dx and dy point from the eye
+// centre to the cursor. The result is the pupil's offset from the eye centre.
 function pupilOffset(dx, dy) {
   if (dx === 0 && dy === 0) return { x: 0, y: 0 }
 

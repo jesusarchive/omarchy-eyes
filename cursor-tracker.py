@@ -53,7 +53,7 @@ def main():
         try:
             position = poll(path)
         except OSError:
-            # The shell starts a new helper when Hyprland exposes a new socket.
+            # Retry until the shell replaces this helper after a socket change.
             time.sleep(RETRY_DELAY)
             continue
         if position and position != last:
