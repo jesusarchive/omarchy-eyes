@@ -8,7 +8,7 @@ Based on X.Org's [xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes), Eyes ad
 
 - Omarchy Quattro with the Omarchy Shell plugin system.
 - Hyprland.
-- Python 3 at `/usr/bin/python3`.
+- Python 3.
 
 The plugin does not install dependencies or require elevated privileges.
 
