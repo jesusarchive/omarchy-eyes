@@ -1,6 +1,6 @@
 # Eyes for Omarchy
 
-Eyes adds a pair of animated eyes to the [Omarchy](https://omarchy.org) bar. The pupils follow the pointer across every monitor, and the widget adapts to horizontal and vertical bars.
+Based on X.Org's [xeyes](https://gitlab.freedesktop.org/xorg/app/xeyes), Eyes adds a pair of animated eyes to the [Omarchy](https://omarchy.org) bar. The pupils follow the pointer across every monitor, and the widget adapts to horizontal and vertical bars.
 
 ![Eyes in the Omarchy bar](preview.png)
 
